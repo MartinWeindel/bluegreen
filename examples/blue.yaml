@@ -1,0 +1,47 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blue
+  labels:
+    app: blue
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: blue
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blue
+  labels:
+    app: blue
+spec:
+  selector:
+    matchLabels:
+      app: blue
+  template:
+    metadata:
+      name: blue
+      labels:
+        app: blue
+    spec:
+      containers:
+        - name: bluegreen
+          image: "eu.gcr.io/gardener-project/test/martinweindel/bluegreen:0.1"
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: COLOR
+            value: blue
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
